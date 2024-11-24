@@ -1,9 +1,10 @@
 package edu.hitsz.aircraft;
 
-import edu.hitsz.application.Game;
-import edu.hitsz.bullet.Bullet;
+import edu.hitsz.application.Main;
+import edu.hitsz.basic.Observer;
+import edu.hitsz.prop.BaseProp;
+import edu.hitsz.shootstrategy.StraightStartegy;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -12,32 +13,33 @@ import java.util.List;
  *
  * @author hitsz
  */
-public class MobEnemy extends AbstractAircraft {
-    /**
-     * 获得敌机分数，击毁敌机时，调用该方法获得分数。
-     * @return 敌机的分数
-     */
-    public int score() {
-        return 10;
-    }
-
-    private static final List<Bullet> EMPTY_BULLETS = new LinkedList<>();
+public class MobEnemy extends AbstractEnemy implements Observer {
 
     public MobEnemy(int locationX, int locationY, int speedX, int speedY, int hp) {
         super(locationX, locationY, speedX, speedY, hp);
+        super.setPower(0);
+        super.setDirection(0);
+        super.setShootNum(0);
+        super.setStrategy(new StraightStartegy());
+        super.setScore(10);//击败普通敌机获得10分
     }
 
     @Override
     public void forward() {
         super.forward();
         // 判定 y 轴向下飞行出界
-        if (locationY >= Game.WINDOW_HEIGHT ) {
+        if (locationY >= Main.WINDOW_HEIGHT ) {
             vanish();
         }
     }
 
     @Override
-    public List<Bullet> shoot() {
-        return EMPTY_BULLETS;
+    public void update(HeroAircraft herocraft) {
+        this.isValid = false;
+        //System.out.println("击败普通敌机，获得"+this.getScore()+"分");
+        herocraft.setScore(herocraft.getScore()+this.getScore());
     }
+
+    @Override
+    public void PropGenerate(AbstractEnemy mobenemy, List<BaseProp> props){}
 }
